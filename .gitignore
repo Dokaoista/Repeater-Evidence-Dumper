@@ -1,7 +1,7 @@
-# --- Evidência de engagement: NUNCA versionar -------------------------------
-# Estes diretórios/arquivos guardam requests, responses e screenshots de alvos
-# reais. Ficam aqui mesmo o repo sendo separado do runtime, para o caso de
-# alguém clonar dentro de ~/burp-evidence/ e rodar o watcher no mesmo lugar.
+# --- Engagement evidence: NEVER commit --------------------------------------
+# These directories hold requests, responses and screenshots of real targets.
+# They stay listed even though the repo is separate from the runtime directory,
+# in case someone clones into ~/burp-evidence/ and runs the watcher there.
 inbox/
 out/
 .failed/
@@ -16,18 +16,18 @@ build/
 !**/gradle/wrapper/gradle-wrapper.jar
 *.class
 
-# --- Artefatos de render ----------------------------------------------------
-# shot.mjs escreve um .html ao lado do .png; só serve de debug quando o render
-# falha e normalmente é apagado no fim.
+# --- Render artifacts -------------------------------------------------------
+# shot.mjs writes an .html next to the .png; it is only useful for debugging a
+# failed render and is normally deleted at the end.
 *.html
 !samples/*.html
 
-# --- Lixo de SO / editor ----------------------------------------------------
+# --- OS / editor cruft ------------------------------------------------------
 .DS_Store
 *.bak
 *.swp
 .idea/
 .vscode/
 
-# Staging de release (jar + notas), não versionado
+# Release staging area (jar + notes), not committed
 dist/

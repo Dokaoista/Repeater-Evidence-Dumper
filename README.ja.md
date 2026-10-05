@@ -68,7 +68,7 @@ jar は `extension/build/libs/repeater-evidence-dumper.jar` に出力されま�
 ## インストール
 
 1. **Burp** → *Extensions* → *Add* → 種別 *Java* → 当該の jar を選択します。
-   ログに `Repeater Evidence Dumper carregado` と表示されるはずです。
+   ログに `Repeater Evidence Dumper loaded` と表示されるはずです。
 2. 3 つのスクリプトを実行用ディレクトリにコピーします。
 
 ```bash
@@ -92,7 +92,7 @@ cd ~/burp-evidence && ./watch.sh &
 から作られます。
 
 ```
-00042-post-api-usuarios.png
+00042-post-api-activity-categories.png
 ```
 
 **手動。** Repeater タブのリクエスト／レスポンスエディタ内で右クリックし、

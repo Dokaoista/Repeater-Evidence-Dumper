@@ -72,7 +72,7 @@ tiempo de ejecución y nunca se empaqueta dentro del jar.
 ## Instalación
 
 1. **Burp** → *Extensions* → *Add* → tipo *Java* → selecciona el jar.
-   El log debe mostrar `Repeater Evidence Dumper carregado`.
+   El log debe mostrar `Repeater Evidence Dumper loaded`.
 2. Copia los tres scripts al directorio de ejecución:
 
 ```bash
@@ -97,7 +97,7 @@ renderiza en `~/burp-evidence/out/`, con el nombre formado por el id del
 mensaje, el método y la ruta:
 
 ```
-00042-post-api-usuarios.png
+00042-post-api-activity-categories.png
 ```
 
 **Manual.** Clic derecho dentro del editor de petición/respuesta de una pestaña

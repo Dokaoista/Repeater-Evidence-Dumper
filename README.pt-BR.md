@@ -71,7 +71,7 @@ Prefere não compilar? Pegue o jar pronto na página de
 ## Instalação
 
 1. **Burp** → *Extensions* → *Add* → tipo *Java* → selecione o jar.
-   O log deve mostrar `Repeater Evidence Dumper carregado`.
+   O log deve mostrar `Repeater Evidence Dumper loaded`.
 2. Copie os três scripts para o diretório de runtime:
 
 ```bash
@@ -94,7 +94,7 @@ cd ~/burp-evidence && ./watch.sh &
 `~/burp-evidence/out/`, nomeado pelo id da mensagem, método e path:
 
 ```
-00042-post-api-usuarios.png
+00042-post-api-activity-categories.png
 ```
 
 **Manual.** Botão direito dentro do editor de request/response de uma aba do

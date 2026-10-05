@@ -73,7 +73,7 @@ Lieber nicht selbst bauen? Hol dir das fertige Jar von der Seite
 ## Installation
 
 1. **Burp** → *Extensions* → *Add* → Typ *Java* → das Jar auswählen.
-   Im Log sollte `Repeater Evidence Dumper carregado` erscheinen.
+   Im Log sollte `Repeater Evidence Dumper loaded` erscheinen.
 2. Die drei Skripte ins Laufzeitverzeichnis kopieren:
 
 ```bash
@@ -98,7 +98,7 @@ rendert es nach `~/burp-evidence/out/`, benannt nach Message-ID, Methode und
 Pfad:
 
 ```
-00042-post-api-usuarios.png
+00042-post-api-activity-categories.png
 ```
 
 **Manuell.** Rechtsklick im Request/Response-Editor eines Repeater-Tabs und dann

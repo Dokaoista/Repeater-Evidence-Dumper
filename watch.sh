@@ -1,7 +1,7 @@
 #!/bin/bash
-# Observa ~/burp-evidence/inbox/ e renderiza automaticamente cada par
-# *.request.txt / *.response.txt novo para ~/burp-evidence/out/*.png via shot.mjs.
-# Nunca sobrescreve um PNG ja existente (presumido revisado).
+# Watches ~/burp-evidence/inbox/ and automatically renders every new
+# *.request.txt / *.response.txt pair to ~/burp-evidence/out/*.png via shot.mjs.
+# Never overwrites an existing PNG (assumed already reviewed).
 set -u
 HOME_DIR="$HOME/burp-evidence"
 INBOX="$HOME_DIR/inbox"
@@ -12,14 +12,14 @@ LOCK="$HOME_DIR/.watcher.lock"
 cd "$HOME_DIR" || exit 1
 mkdir -p "$FAILED"
 
-# Evita dois watchers concorrendo pelos mesmos arquivos.
+# Stops two watchers from racing over the same files.
 if ! mkdir "$LOCK" 2>/dev/null; then
-  echo "$(date '+%Y-%m-%d %H:%M:%S') ja existe watcher rodando (remova $LOCK se for engano)" >> "$LOG"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') a watcher is already running (remove $LOCK if that is wrong)" >> "$LOG"
   exit 1
 fi
 trap 'rmdir "$LOCK" 2>/dev/null' EXIT
 
-echo "$(date '+%Y-%m-%d %H:%M:%S') watcher iniciado (pid $$)" >> "$LOG"
+echo "$(date '+%Y-%m-%d %H:%M:%S') watcher started (pid $$)" >> "$LOG"
 
 while true; do
   shopt -s nullglob
@@ -29,10 +29,10 @@ while true; do
     png="$OUT/$base.png"
     marker="$FAILED/$base"
 
-    # Ja renderizado, ou ja falhou antes (apague o marcador em .failed/ para retentar).
+    # Already rendered, or already failed before (delete the marker in .failed/ to retry).
     [ -e "$png" ] && continue
     [ -e "$marker" ] && continue
-    # A extensao grava request e response separadamente; so processa o par completo.
+    # The extension writes request and response separately; only process a complete pair.
     [ -f "$req" ] && [ -f "$resp" ] || continue
 
     if node shot.mjs --request "$req" --response "$resp" --out "$png" >> "$LOG" 2>&1; then
@@ -43,7 +43,7 @@ while true; do
     fi
   done
 
-  # Log crescia sem limite; mantem as ultimas 1000 linhas.
+  # The log grew without bound; keep the last 1000 lines.
   if [ "$(wc -l < "$LOG" 2>/dev/null || echo 0)" -gt 2000 ]; then
     tail -1000 "$LOG" > "$LOG.tmp" 2>/dev/null && mv "$LOG.tmp" "$LOG"
   fi

@@ -9,7 +9,7 @@ const argv = process.argv.slice(2);
 const opt = (n, d) => { const i = argv.indexOf('--' + n); return i > -1 ? argv[i + 1] : d; };
 const flag = n => argv.includes('--' + n);
 
-const fail = msg => { console.error('erro: ' + msg); process.exit(1); };
+const fail = msg => { console.error('error: ' + msg); process.exit(1); };
 
 let request = '', response = '', out = '', width = 2000, scale = 1;
 let redactOn = !flag('no-redact');
@@ -27,20 +27,20 @@ if (input) {
   const rf = opt('request'), sf = opt('response');
   out = opt('out') || out;
   if (!rf || !out) {
-    fail('uso: node shot.mjs --request req.txt --response resp.txt --out saida.png [--width 2000] [--scale 1] [--no-redact]\n      ou: node shot.mjs --input spec.json');
+    fail('usage: node shot.mjs --request req.txt --response resp.txt --out output.png [--width 2000] [--scale 1] [--no-redact]\n       or: node shot.mjs --input spec.json');
   }
   request = readFileSync(rf, 'utf8');
   if (sf) response = readFileSync(sf, 'utf8');
   width = Number(opt('width', 2000)) || 2000;
   scale = Number(opt('scale', 1)) || 1;
 }
-if (!out) fail('--out é obrigatório');
+if (!out) fail('--out is required');
 const maxHeight = Number(opt('max-height', 420)) || 420;
 
 const SENSITIVE = /^(cookie|set-cookie|authorization|proxy-authorization|x-csrf-token|x-xsrf-token|x-auth-token)$/i;
 function redactSecrets(text) {
-  // Normaliza CRLF antes: capturas reais do Burp vem com \r\n e o regex abaixo
-  // usa (.*)$ -- '.' nao casa \r, entao a redacao falhava silenciosamente.
+  // Normalize CRLF first: real Burp captures come with \r\n and the regex below
+  // uses (.*)$ -- '.' does not match \r, so redaction failed silently.
   return text.replace(/\r\n?/g, '\n').split('\n').map(line => {
     const m = line.match(/^([A-Za-z0-9-]+):[ \t]*(.*)$/);
     if (!m || !SENSITIVE.test(m[1])) return line;
@@ -111,7 +111,7 @@ function renderLines(raw, firstCls) {
   }
   for (const l of shown) outLines.push(headerLine(l));
   if (omitted > 0) {
-    outLines.push(`<span class="dim">&#8942; ${omitted} header(s) omitido(s) -- use --all-headers para ver todos</span>`);
+    outLines.push(`<span class="dim">&#8942; ${omitted} header(s) omitted -- use --all-headers to show them all</span>`);
   }
   outLines.push('');
   const body = lines.slice(i).join('\n');
@@ -121,7 +121,7 @@ function renderLines(raw, firstCls) {
     if (highlighted.length > MAX_BODY_LINES) {
       const totalBytes = Buffer.byteLength(body, 'utf8');
       outLines.push(...highlighted.slice(0, MAX_BODY_LINES));
-      outLines.push(`<span class="dim">&#8942; body truncado: ${MAX_BODY_LINES} de ${highlighted.length} linhas (${totalBytes.toLocaleString('pt-BR')} bytes totais) -- ver .response.txt/.request.txt bruto para o conteudo completo</span>`);
+      outLines.push(`<span class="dim">&#8942; body truncated: ${MAX_BODY_LINES} of ${highlighted.length} lines (${totalBytes.toLocaleString('en-US')} bytes total) -- see the raw .request.txt/.response.txt for the full content</span>`);
     } else {
       outLines.push(...highlighted);
     }
@@ -150,8 +150,8 @@ if (redactOn) {
   response = redactSecrets(response);
 }
 
-const reqLines = request.trim() === '' ? ['<span class="dim">(sem request)</span>'] : renderLines(request, 'reqline');
-const respLines = response.trim() === '' ? ['<span class="dim">(sem resposta capturada)</span>'] : renderLines(response, 'statusline');
+const reqLines = request.trim() === '' ? ['<span class="dim">(no request)</span>'] : renderLines(request, 'reqline');
+const respLines = response.trim() === '' ? ['<span class="dim">(no response captured)</span>'] : renderLines(response, 'statusline');
 
 const maxLines = Math.max(reqLines.length, respLines.length, 1);
 const height = Math.min(Math.max(420, 124 + maxLines * 24), 10000);
@@ -160,8 +160,8 @@ const html = `<!doctype html>
 <html><head><meta charset="utf-8"><style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { background: #1e1e1e; height: 100%; }
-/* min-height garante que os paineis preencham a imagem inteira: sem isso,
-   conteudo curto deixava uma faixa escura do fundo da pagina embaixo. */
+/* min-height makes the panes fill the whole image: without it, short content
+   left a dark strip of the page background at the bottom. */
 .wrap { display: flex; gap: 8px; min-height: 100vh; align-items: stretch; }
 .pane { flex: 1 1 50%; min-width: 0; background: #2b2b2b; display: flex; flex-direction: column; }
 .pane-title { color: #eaeaea; font: 700 15px/1.4 -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; padding: 14px 16px 2px; }
@@ -207,7 +207,7 @@ const FIREFOX = '/Applications/Firefox.app/Contents/MacOS/firefox';
 const profile = mkdtempSync(join(tmpdir(), 'burp-shot-'));
 const ffProfile = mkdtempSync(join(tmpdir(), 'burp-shot-ff-'));
 
-// Perfis temporarios do browser vazavam ~6MB por render (1.5GB acumulados).
+// Temporary browser profiles leaked ~6MB per render (1.5GB piled up).
 process.on('exit', () => {
   for (const dir of [profile, ffProfile]) {
     try { rmSync(dir, { recursive: true, force: true }); } catch {}
@@ -237,18 +237,18 @@ if (!done && existsSync(FIREFOX)) {
 if (!done && existsSync(BRAVE)) {
   done = run(BRAVE, ['--headless=new', ...chromiumArgs], 15000) || run(BRAVE, ['--headless', ...chromiumArgs], 15000);
 }
-if (!done) fail('nenhum browser conseguiu gerar o screenshot (Chromium e Firefox falharam). HTML em ' + htmlAbs);
+if (!done) fail('no browser managed to produce the screenshot (Chromium and Firefox both failed). HTML left at ' + htmlAbs);
 
 if (maxHeight > 0) {
   try {
     const scriptDir = fileURLToPath(new URL('.', import.meta.url));
     execFileSync('python3', [join(scriptDir, 'crop.py'), outAbs, String(Math.round(maxHeight * scale))], { stdio: 'ignore', timeout: 15000 });
   } catch (e) {
-    console.error('aviso: recorte de altura falhou (' + (e && e.message) + '), PNG ficou no tamanho renderizado.');
+    console.error('warning: height crop failed (' + (e && e.message) + '), the PNG kept its rendered size.');
   }
 }
 
-// O .html so serve de artefato de debug quando o render falha.
+// The .html is only a debug artifact for when the render fails.
 try { unlinkSync(htmlAbs); } catch {}
 
-console.log(`ok → ${outAbs}`);
+console.log(`ok -> ${outAbs}`);

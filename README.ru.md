@@ -73,7 +73,7 @@ Jar появится в `extension/build/libs/repeater-evidence-dumper.jar`. Mon
 ## Установка
 
 1. **Burp** → *Extensions* → *Add* → тип *Java* → выберите jar.
-   В логе должно появиться `Repeater Evidence Dumper carregado`.
+   В логе должно появиться `Repeater Evidence Dumper loaded`.
 2. Скопируйте три скрипта в рабочий каталог:
 
 ```bash
@@ -98,7 +98,7 @@ cd ~/burp-evidence && ./watch.sh &
 метода и пути:
 
 ```
-00042-post-api-usuarios.png
+00042-post-api-activity-categories.png
 ```
 
 **Вручную.** Правый клик внутри редактора запроса/ответа во вкладке Repeater и

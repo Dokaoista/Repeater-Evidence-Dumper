@@ -71,7 +71,7 @@ Prefer not to build? Grab the prebuilt jar from the
 ## Installation
 
 1. **Burp** → *Extensions* → *Add* → type *Java* → pick the jar.
-   The log should print `Repeater Evidence Dumper carregado`.
+   The log should print `Repeater Evidence Dumper loaded`.
 2. Copy the three scripts into the runtime directory:
 
 ```bash
@@ -95,7 +95,7 @@ cd ~/burp-evidence && ./watch.sh &
 it into `~/burp-evidence/out/`, named after the message id, method, and path:
 
 ```
-00042-post-api-usuarios.png
+00042-post-api-activity-categories.png
 ```
 
 **Manual.** Right-click inside the request/response editor of a Repeater tab and

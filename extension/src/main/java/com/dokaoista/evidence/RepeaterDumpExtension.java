@@ -29,17 +29,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 /**
- * Observa toda requisicao/resposta que passa pela aba Repeater do Burp e grava
- * o par request/response em texto cru dentro de ~/burp-evidence/inbox, pronto
- * para o renderizador shot.mjs transformar em PNG.
+ * Watches every request/response going through Burp's Repeater and writes the
+ * pair as raw text into ~/burp-evidence/inbox, ready for the shot.mjs renderer
+ * to turn into a PNG.
  *
- * NOTA: a Montoya API (2025.5, a mais recente publicada) nao expõe um metodo
- * para enumerar as abas abertas do Repeater nem ler o estado atual de uma aba
- * (nao existe Repeater.repeaterTabs() ou RepeaterTab). O pacote burp.api.montoya.repeater
- * so tem Repeater.sendToRepeater(...). Por isso a captura é orientada a evento
- * (HttpHandler, dispara a cada "Send" real) em vez de polling a cada 3s —
- * funcionalmente equivalente (ou melhor: zero atraso) para o objetivo de gerar
- * evidência, mas não é uma leitura passiva do estado das abas.
+ * NOTE: the Montoya API (2025.5, the latest published) exposes no method to
+ * enumerate the open Repeater tabs nor to read a tab's current state (there is
+ * no Repeater.repeaterTabs() or RepeaterTab). The burp.api.montoya.repeater
+ * package only offers Repeater.sendToRepeater(...). Capture is therefore
+ * event driven (HttpHandler, firing on every real "Send") instead of polling
+ * every 3s. For the goal of generating evidence that is functionally
+ * equivalent, or better since there is zero lag, but it is not a passive read
+ * of tab state.
  */
 public class RepeaterDumpExtension implements BurpExtension {
 
@@ -57,7 +58,7 @@ public class RepeaterDumpExtension implements BurpExtension {
         try {
             Files.createDirectories(INBOX);
         } catch (IOException e) {
-            api.logging().logToError("Nao foi possivel criar " + INBOX + ": " + e.getMessage());
+            api.logging().logToError("Could not create " + INBOX + ": " + e.getMessage());
         }
 
         api.http().registerHttpHandler(new HttpHandler() {
@@ -72,16 +73,16 @@ public class RepeaterDumpExtension implements BurpExtension {
                     try {
                         dumpAuto(responseReceived.messageId(), responseReceived.initiatingRequest(), responseReceived);
                     } catch (Exception e) {
-                        api.logging().logToError("Falha ao gravar evidencia do Repeater", e);
+                        api.logging().logToError("Failed to write Repeater evidence", e);
                     }
                 }
                 return ResponseReceivedAction.continueWith(responseReceived);
             }
         });
 
-        // Fallback manual: botao direito dentro do editor de request/response de uma aba
-        // Repeater -> "Dump Repeater tab now (evidence)". Util quando a aba ainda nao foi
-        // enviada (so grava o request) ou para forcar uma nova captura pontual.
+        // Manual fallback: right-click inside the request/response editor of a Repeater
+        // tab -> "Dump Repeater tab now (evidence)". Useful when the tab has not been
+        // sent yet (captures the request only) or to force a one-off capture.
         api.userInterface().registerContextMenuItemsProvider(new ContextMenuItemsProvider() {
             @Override
             public List<Component> provideMenuItems(ContextMenuEvent event) {
@@ -98,14 +99,14 @@ public class RepeaterDumpExtension implements BurpExtension {
                     try {
                         dumpManual(rr.request(), rr.hasResponse() ? rr.response() : null);
                     } catch (Exception ex) {
-                        api.logging().logToError("Falha no dump manual", ex);
+                        api.logging().logToError("Manual dump failed", ex);
                     }
                 });
                 return List.of(item);
             }
         });
 
-        api.logging().logToOutput("Repeater Evidence Dumper carregado. Gravando em " + INBOX);
+        api.logging().logToOutput("Repeater Evidence Dumper loaded. Writing to " + INBOX);
     }
 
     private void dumpAuto(int messageId, HttpRequest request, HttpResponse response) throws IOException {
@@ -134,6 +135,6 @@ public class RepeaterDumpExtension implements BurpExtension {
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         Files.writeString(respFile, responseText, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-        api.logging().logToOutput("Evidencia gravada: " + name);
+        api.logging().logToOutput("Evidence written: " + name);
     }
 }

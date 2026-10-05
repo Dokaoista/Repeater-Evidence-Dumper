@@ -1,6 +1,6 @@
 HTTP/2 200 OK
 Content-Type: application/json; charset=utf-8
-Content-Length: 82
+Content-Length: 91
 Cross-Origin-Resource-Policy: same-origin
 Origin-Agent-Cluster: ?1
 X-Dns-Prefetch-Control: off
@@ -12,7 +12,7 @@ Ratelimit-Remaining: 5998
 Ratelimit-Reset: 1169
 
 {
-  "name":"PoC-BFLA-CategoriaAtividade-v2",
+  "name":"PoC-BFLA-ActivityCategory-v2",
   "_id":"6abe93a2d6a878363117ac58",
   "__v":0
 }

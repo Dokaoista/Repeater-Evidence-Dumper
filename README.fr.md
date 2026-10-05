@@ -73,7 +73,7 @@ Vous préférez ne pas compiler ? Récupérez le jar déjà construit sur la pag
 ## Installation
 
 1. **Burp** → *Extensions* → *Add* → type *Java* → sélectionnez le jar.
-   Le journal doit afficher `Repeater Evidence Dumper carregado`.
+   Le journal doit afficher `Repeater Evidence Dumper loaded`.
 2. Copiez les trois scripts dans le répertoire d'exécution :
 
 ```bash
@@ -98,7 +98,7 @@ watcher la génère dans `~/burp-evidence/out/`, nommée d'après l'id du messag
 la méthode et le chemin :
 
 ```
-00042-post-api-usuarios.png
+00042-post-api-activity-categories.png
 ```
 
 **Manuel.** Clic droit dans l'éditeur de requête/réponse d'un onglet Repeater

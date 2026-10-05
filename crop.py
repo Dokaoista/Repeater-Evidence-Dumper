@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-Recorta um PNG gerado pelo shot.mjs para uma altura maxima, adicionando uma
-faixa de rodape avisando que a imagem foi recortada (o Firefox headless
-captura exatamente o viewport, entao um corte sem aviso perderia conteudo
-silenciosamente).
+Crops a PNG produced by shot.mjs down to a maximum height, adding a footer bar
+warning that the image was cropped (headless Firefox captures exactly the
+viewport, so an unannounced cut would silently lose content).
 
-Uso: crop.py <png_path> <max_height>
-Sai sem fazer nada se a imagem ja estiver dentro do limite.
+Usage: crop.py <png_path> <max_height>
+Does nothing if the image is already within the limit.
 """
 import sys
 from PIL import Image, ImageDraw, ImageFont
@@ -30,7 +29,7 @@ def load_font(size):
 
 def main():
     if len(sys.argv) != 3:
-        print("uso: crop.py <png_path> <max_height>", file=sys.stderr)
+        print("usage: crop.py <png_path> <max_height>", file=sys.stderr)
         sys.exit(2)
     path = sys.argv[1]
     max_height = int(sys.argv[2])
@@ -44,7 +43,7 @@ def main():
     bar_top = max_height - FOOTER_HEIGHT
     draw.rectangle([0, bar_top, img.width, max_height], fill=(30, 30, 30))
     draw.line([0, bar_top, img.width, bar_top], fill=(70, 70, 70), width=1)
-    text = "⋮ imagem recortada em {}px -- ver .png original/.html ou o .txt bruto para o conteudo completo".format(max_height)
+    text = "⋮ image cropped at {}px -- see the original .png/.html or the raw .txt for the full content".format(max_height)
     font = load_font(13)
     draw.text((12, bar_top + 7), text, fill=(138, 138, 138), font=font)
     cropped.save(path)

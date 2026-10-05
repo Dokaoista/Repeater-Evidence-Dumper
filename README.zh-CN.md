@@ -63,7 +63,7 @@ cd extension
 ## 安装
 
 1. **Burp** → *Extensions* → *Add* → 类型选 *Java* → 选择该 jar。
-   日志里应当出现 `Repeater Evidence Dumper carregado`。
+   日志里应当出现 `Repeater Evidence Dumper loaded`。
 2. 把三个脚本复制到运行目录：
 
 ```bash
@@ -86,7 +86,7 @@ cd ~/burp-evidence && ./watch.sh &
 `~/burp-evidence/out/`，文件名由消息 id、方法和路径组成：
 
 ```
-00042-post-api-usuarios.png
+00042-post-api-activity-categories.png
 ```
 
 **手动。** 在 Repeater 标签页的请求/响应编辑器里点右键，选择
