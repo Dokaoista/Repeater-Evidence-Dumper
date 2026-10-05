@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Fornecida pelo classloader do Burp em runtime - não precisa ir no jar final.
+    compileOnly 'net.portswigger.burp.extensions:montoya-api:2025.5'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+    archiveBaseName = 'repeater-evidence-dumper'
+    archiveVersion = ''
+}

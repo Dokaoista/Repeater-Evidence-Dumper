@@ -1,0 +1,11 @@
+POST /api/categorias-atividade HTTP/2
+Host: target.example.com
+Accept: application/json
+Content-Type: application/json
+Cookie: app.sid=s%3AEXAMPLEEXAMPLEEXAMPLE_5.EXAMPLESIGNATUREEXAMPLEEXAMPLEEXAMPLEEXAMPLE
+Content-Length: 81
+
+{
+  "name":"PoC-BFLA-CategoriaAtividade-v2",
+  "descricao":"Teste de escrita sem RBAC"
+}

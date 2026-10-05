@@ -1,0 +1,30 @@
+# --- Evidência de engagement: NUNCA versionar -------------------------------
+# Estes diretórios/arquivos guardam requests, responses e screenshots de alvos
+# reais. Ficam aqui mesmo o repo sendo separado do runtime, para o caso de
+# alguém clonar dentro de ~/burp-evidence/ e rodar o watcher no mesmo lugar.
+inbox/
+out/
+.failed/
+.watcher.lock/
+watch.log
+watch.log.tmp
+
+# --- Build ------------------------------------------------------------------
+build/
+.gradle/
+*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+*.class
+
+# --- Artefatos de render ----------------------------------------------------
+# shot.mjs escreve um .html ao lado do .png; só serve de debug quando o render
+# falha e normalmente é apagado no fim.
+*.html
+!samples/*.html
+
+# --- Lixo de SO / editor ----------------------------------------------------
+.DS_Store
+*.bak
+*.swp
+.idea/
+.vscode/
