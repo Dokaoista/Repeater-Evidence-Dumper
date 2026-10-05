@@ -28,3 +28,6 @@ build/
 *.swp
 .idea/
 .vscode/
+
+# Staging de release (jar + notas), não versionado
+dist/

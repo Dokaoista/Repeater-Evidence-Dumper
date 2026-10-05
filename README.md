@@ -1,56 +1,58 @@
 # Repeater Evidence Dumper
 
-Extensão do Burp Suite que transforma cada *Send* do Repeater em um screenshot de
-evidência pronto para report — com a cara da interface do Burp e com os segredos
-já redigidos.
+**English** · [Português (BR)](README.pt-BR.md) · [Español](README.es.md) · [简体中文](README.zh-CN.md) · [Русский](README.ru.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [日本語](README.ja.md)
 
-![Exemplo de saída](samples/demo.png)
+A Burp Suite extension that turns every Repeater *Send* into a report-ready
+evidence screenshot, styled like the Burp UI, with secrets already redacted.
 
-Capturar evidência para um report de bug bounty ou pentest normalmente é manual:
-dar print da tela do Burp, recortar, borrar o cookie, repetir para cada request.
-Isso automatiza o ciclo inteiro — você só envia a request no Repeater, o PNG
-aparece.
+![Sample output](samples/demo.png)
 
-## Como funciona
+Capturing evidence for a bug bounty or pentest report is normally a manual
+chore: screenshot the Burp window, crop it, blur the cookie, repeat for every
+request. This automates the whole loop. You send the request in Repeater and the
+PNG shows up.
 
-Três peças, ligadas por um diretório:
+## How it works
+
+Three pieces, wired together by a directory:
 
 ```
-Burp Repeater ──(cada Send)──▶ ~/burp-evidence/inbox/*.request.txt
+Burp Repeater ──(each Send)──▶ ~/burp-evidence/inbox/*.request.txt
                                                     *.response.txt
                                        │
-                        watch.sh (polling de 3s)
+                          watch.sh (3s polling)
                                        │
-                                  shot.mjs  ──▶ HTML com o tema do Burp
-                                       │        └▶ browser headless (--screenshot)
-                                       │             └▶ crop.py (recorte + aviso)
+                                  shot.mjs  ──▶ HTML styled like Burp
+                                       │        └▶ headless browser (--screenshot)
+                                       │             └▶ crop.py (crop + notice)
                                        ▼
                                ~/burp-evidence/out/*.png
 ```
 
-1. **`extension/`** — extensão Java (Montoya API). Registra um `HttpHandler` que
-   grava, em texto cru, todo par request/response originado no Repeater.
-2. **`watch.sh`** — observa o `inbox/` e renderiza cada par novo. Nunca
-   sobrescreve um PNG existente (presume-se revisado) e marca falhas em
-   `.failed/` para não ficar tentando em loop.
-3. **`shot.mjs`** — monta um HTML que replica o visual do Burp (painéis Request /
-   Response, numeração de linha, syntax highlight de JSON) e fotografa com um
-   browser headless. `crop.py` limita a altura, adicionando uma faixa de aviso
-   para que o corte nunca seja silencioso.
+1. **`extension/`** is the Java extension (Montoya API). It registers an
+   `HttpHandler` that writes every request/response pair originating from
+   Repeater as raw text.
+2. **`watch.sh`** watches `inbox/` and renders each new pair. It never
+   overwrites an existing PNG, which is assumed reviewed, and records failures
+   in `.failed/` so it won't retry in a loop.
+3. **`shot.mjs`** builds an HTML page that replicates the Burp look (Request and
+   Response panes, line numbers, JSON syntax highlighting) and photographs it
+   with a headless browser. `crop.py` caps the height, adding a notice bar so a
+   crop is never silent.
 
-## Requisitos
+## Requirements
 
-| Componente | Necessário para |
+| Component | Needed for |
 |---|---|
-| Burp Suite (Montoya API 2025.5) | a extensão |
-| Java 17+ | compilar a extensão |
-| Node.js | `shot.mjs` (sem dependências externas) |
-| Python 3 + [Pillow](https://pypi.org/project/Pillow/) | `crop.py` (recorte de altura) |
-| Chrome/Chromium/Edge/Vivaldi, Firefox ou Brave | renderizar o screenshot |
+| Burp Suite (Montoya API 2025.5) | the extension |
+| Java 17+ | building the extension |
+| Node.js | `shot.mjs` (no external dependencies) |
+| Python 3 + [Pillow](https://pypi.org/project/Pillow/) | `crop.py` (height cropping) |
+| Chrome/Chromium/Edge/Vivaldi, Firefox, or Brave | rendering the screenshot |
 
-O renderizador tenta os browsers nessa ordem e usa o primeiro que funcionar.
-Os caminhos são de macOS — em outro SO, ajuste as constantes `CHROMIUM`,
-`FIREFOX` e `BRAVE` no topo do `shot.mjs`.
+The renderer tries those browsers in that order and uses the first one that
+works. The paths are macOS ones. On another OS, adjust the `CHROMIUM`,
+`FIREFOX`, and `BRAVE` constants at the top of `shot.mjs`.
 
 ## Build
 
@@ -59,109 +61,113 @@ cd extension
 ./gradlew build
 ```
 
-O jar sai em `extension/build/libs/repeater-evidence-dumper.jar`. A Montoya API
-entra como `compileOnly` — quem fornece em runtime é o classloader do Burp, então
-ela não vai no jar.
+The jar lands in `extension/build/libs/repeater-evidence-dumper.jar`. The
+Montoya API is declared `compileOnly`, so Burp's own classloader provides it at
+runtime and it never gets bundled into the jar.
 
-## Instalação
+Prefer not to build? Grab the prebuilt jar from the
+[Releases](../../releases) page.
 
-1. **Burp** → *Extensions* → *Add* → tipo *Java* → selecione o jar.
-   O log deve mostrar `Repeater Evidence Dumper carregado`.
-2. Copie os três scripts para o diretório de runtime:
+## Installation
+
+1. **Burp** → *Extensions* → *Add* → type *Java* → pick the jar.
+   The log should print `Repeater Evidence Dumper carregado`.
+2. Copy the three scripts into the runtime directory:
 
 ```bash
 mkdir -p ~/burp-evidence && cp shot.mjs crop.py watch.sh ~/burp-evidence/
 ```
 
-3. Suba o watcher:
+3. Start the watcher:
 
 ```bash
 cd ~/burp-evidence && ./watch.sh &
 ```
 
-> O caminho `~/burp-evidence/` é fixo: a extensão grava em
-> `$HOME/burp-evidence/inbox` e o `watch.sh` espera o `shot.mjs` ao lado dele.
-> Para mudar, edite a constante `INBOX` no Java e `HOME_DIR` no `watch.sh`.
+> The `~/burp-evidence/` path is hardcoded: the extension writes to
+> `$HOME/burp-evidence/inbox`, and `watch.sh` expects `shot.mjs` next to it.
+> To change it, edit the `INBOX` constant in the Java source and `HOME_DIR` in
+> `watch.sh`.
 
-## Uso
+## Usage
 
-**Automático** — qualquer *Send* no Repeater grava o par e o watcher renderiza
-em `~/burp-evidence/out/`, nomeado pelo id da mensagem, método e path:
+**Automatic.** Any *Send* in Repeater writes the pair, and the watcher renders
+it into `~/burp-evidence/out/`, named after the message id, method, and path:
 
 ```
 00042-post-api-usuarios.png
 ```
 
-**Manual** — botão direito dentro do editor de request/response de uma aba do
-Repeater → **"Dump Repeater tab now (evidence)"**. Útil quando a aba ainda não
-foi enviada (grava só o request) ou para forçar uma captura pontual. Esses saem
-como `manual-00001-...`.
+**Manual.** Right-click inside the request/response editor of a Repeater tab and
+pick **"Dump Repeater tab now (evidence)"**. Useful when the tab has not been
+sent yet, in which case it captures the request only, or to force a one-off
+capture. These are named `manual-00001-...`.
 
-**Avulso** — o renderizador roda sozinho sobre qualquer par de arquivos:
+**Standalone.** The renderer runs on its own against any pair of files:
 
 ```bash
-node shot.mjs --request req.txt --response resp.txt --out evidencia.png
+node shot.mjs --request req.txt --response resp.txt --out evidence.png
 ```
 
-## Redação de segredos
+## Secret redaction
 
-Ligada por padrão. Os headers abaixo têm o valor substituído por `<REDACTED>`
-antes de qualquer renderização:
+On by default. The headers below have their value replaced with `<REDACTED>`
+before anything is rendered:
 
 `Cookie` · `Set-Cookie` · `Authorization` · `Proxy-Authorization` ·
 `X-CSRF-Token` · `X-XSRF-Token` · `X-Auth-Token`
 
-Cookies preservam o **nome** de cada par e redigem só o valor
-(`app.sid=<REDACTED>`), o que mantém a evidência legível — dá para ver que havia
-sessão sem expor a sessão. Em `Authorization`, o esquema é preservado
-(`Bearer <REDACTED>`).
+Cookies keep the **name** of each pair and redact only the value
+(`app.sid=<REDACTED>`), which keeps the evidence readable. You can see a session
+was present without exposing the session. For `Authorization`, the scheme is
+preserved (`Bearer <REDACTED>`).
 
-`--no-redact` desliga. Não use em evidência que vai para um report.
+`--no-redact` turns it off. Don't use it on evidence headed for a report.
 
-## Opções do `shot.mjs`
+## `shot.mjs` options
 
-| Flag | Padrão | Efeito |
+| Flag | Default | Effect |
 |---|---|---|
-| `--request <arquivo>` | — | arquivo do request (obrigatório) |
-| `--response <arquivo>` | — | arquivo do response |
-| `--out <arquivo.png>` | — | PNG de saída (obrigatório) |
-| `--width <px>` | `2000` | largura da imagem |
-| `--scale <n>` | `1` | fator de escala do device (use `2` para retina) |
-| `--max-height <px>` | `420` | altura máxima; acima disso recorta com aviso. `0` desliga |
-| `--all-headers` | desligado | mostra todos os headers, não só os essenciais |
-| `--no-redact` | desligado | desliga a redação de segredos |
-| `--input <spec.json>` | — | lê os parâmetros de um JSON em vez da linha de comando |
+| `--request <file>` | required | request file |
+| `--response <file>` | none | response file |
+| `--out <file.png>` | required | output PNG |
+| `--width <px>` | `2000` | image width |
+| `--scale <n>` | `1` | device scale factor (use `2` for retina) |
+| `--max-height <px>` | `420` | max height; beyond it, crop with a notice. `0` disables |
+| `--all-headers` | off | show every header, not just the essential ones |
+| `--no-redact` | off | disable secret redaction |
+| `--input <spec.json>` | none | read parameters from a JSON file instead of the command line |
 
-Por padrão a renderização só mostra headers relevantes para o report (`Host`,
-`Content-Type`, `Cookie`, `Location`, `Origin`, `Referer`, entre outros) e
-anota quantos foram omitidos. Bodies acima de 300 linhas são truncados com a
-contagem total de linhas e bytes. Nos dois casos o aviso fica visível na imagem —
-o `.txt` cru no `inbox/` continua com o conteúdo completo.
+By default the render shows only headers that matter for a report (`Host`,
+`Content-Type`, `Cookie`, `Location`, `Origin`, `Referer`, among others) and
+notes how many were omitted. Bodies longer than 300 lines are truncated with the
+total line and byte count. In both cases the notice is visible in the image, and
+the raw `.txt` in `inbox/` still holds the full content.
 
-Formato do `--input`:
+`--input` format:
 
 ```json
 {
   "request_file": "req.txt",
   "response_file": "resp.txt",
-  "out": "evidencia.png",
+  "out": "evidence.png",
   "width": 2000,
   "scale": 1,
   "redact": true
 }
 ```
 
-## Limitação conhecida
+## Known limitation
 
-A Montoya API 2025.5 não expõe um jeito de enumerar as abas abertas do Repeater
-nem de ler o estado atual de uma aba — o pacote `burp.api.montoya.repeater` só
-tem `Repeater.sendToRepeater(...)`. Por isso a captura é orientada a evento
-(dispara a cada *Send* real) e não uma leitura passiva do estado das abas.
+The Montoya API 2025.5 exposes no way to enumerate open Repeater tabs or read a
+tab's current state. The `burp.api.montoya.repeater` package only offers
+`Repeater.sendToRepeater(...)`. Capture is therefore event driven, firing on
+every real *Send*, rather than a passive read of tab state.
 
-Na prática isso é equivalente ou melhor para o objetivo de gerar evidência
-(zero atraso), mas significa que uma aba montada e nunca enviada só é capturada
-pelo item de menu manual.
+In practice that is equivalent or better for generating evidence, since there is
+zero lag, but it means a tab that was composed and never sent is only captured
+through the manual menu item.
 
-## Licença
+## License
 
-MIT — veja [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
